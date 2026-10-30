@@ -51,9 +51,15 @@ public class CourseService {
         return new CourseResponse(findCourse(id));
     }
 
-    private Course findCourse(Long id) {
+    public Course findCourse(Long id) {
         return courseRepository.findById(id)
                 .orElseThrow(() -> ApiException.notFound("Khong tim thay khoa hoc"));
+    }
+
+    public Course findOwnedCourse(Long id, Long userId) {
+        Course course = findCourse(id);
+        checkOwner(course, userId);
+        return course;
     }
 
     @Transactional
@@ -70,7 +76,7 @@ public class CourseService {
 
     private void checkOwner(Course course, Long userId) {
         if (!course.getInstructor().getId().equals(userId)) {
-            throw ApiException.forbidden("Ban khong co quyen sua khoa hoc nay.");
+            throw ApiException.forbidden("Ban khong phai giang vien cua khoa hoc nay");
         }
     }
 
