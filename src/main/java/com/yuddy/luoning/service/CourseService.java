@@ -10,6 +10,7 @@ import com.yuddy.luoning.dto.CourseRequest;
 import com.yuddy.luoning.dto.CourseResponse;
 import com.yuddy.luoning.entity.Course;
 import com.yuddy.luoning.entity.User;
+import com.yuddy.luoning.exception.ApiException;
 import com.yuddy.luoning.repository.CourseRepository;
 
 @Service
@@ -44,4 +45,41 @@ public class CourseService {
 
         return new CourseResponse(courseRepository.save(course));
     }
+
+    @Transactional(readOnly = true)
+    public CourseResponse getCourseById(Long id) {
+        return new CourseResponse(findCourse(id));
+    }
+
+    private Course findCourse(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> ApiException.notFound("Khong tim thay khoa hoc"));
+    }
+
+    @Transactional
+    public CourseResponse updateCourse(Long id, CourseRequest request, Long currentUserId) {
+        Course course = findCourse(id);
+        checkOwner(course, currentUserId);
+
+        course.setTitle(request.getTitle());
+        course.setDescription(request.getDescription());
+        course.setPrice(request.getPrice());
+
+        return new CourseResponse(course);
+    }
+
+    private void checkOwner(Course course, Long userId) {
+        if (!course.getInstructor().getId().equals(userId)) {
+            throw ApiException.forbidden("Ban khong co quyen sua khoa hoc nay.");
+        }
+    }
+
+    @Transactional
+    public void deleteCourse(Long id, Long currentUserId) {
+        Course course = findCourse(id); // không có → 404
+        checkOwner(course, currentUserId); // không phải chủ → 403
+
+        courseRepository.delete(course);
+    }
+
 }
