@@ -1,5 +1,6 @@
 package com.yuddy.luoning.controller;
 
+import com.yuddy.luoning.dto.LessonDetailResponse;
 import com.yuddy.luoning.dto.LessonRequest;
 import com.yuddy.luoning.dto.LessonResponse;
 import com.yuddy.luoning.security.CurrentUser;
@@ -39,5 +40,12 @@ public class LessonController {
             @Valid @RequestBody LessonRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return lessonService.createLesson(courseId, request, CurrentUser.id(jwt));
+    }
+
+    @GetMapping("/{lessonId}")
+    public LessonDetailResponse getLesson(@PathVariable Long courseId,
+            @PathVariable Long lessonId,
+            @AuthenticationPrincipal Jwt jwt) {
+        return lessonService.getLesson(courseId, lessonId, CurrentUser.id(jwt));
     }
 }

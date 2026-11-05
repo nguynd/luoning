@@ -12,4 +12,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     Optional<Lesson> findTopByCourseIdOrderByOrderIndexDesc(Long courseId);
 
+    Optional<Lesson> findByIdAndCourseId(Long id, Long courseId);
+
 }
