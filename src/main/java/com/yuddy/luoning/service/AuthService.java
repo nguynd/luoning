@@ -28,19 +28,17 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (request.getRole() == Role.ADMIN) {
-            throw ApiException.badRequest("Khong the tu dang ky tai khoan ADMIN");
-        }
         String email = request.getEmail().trim().toLowerCase();
         if (userRepository.existsByEmail(email)) {
             throw ApiException.conflict("Email da duoc su dung");
         }
 
+        // Tu dang ky luon la hoc vien, tai khoan giang vien do admin cap
         User user = new User(
                 email,
                 passwordEncoder.encode(request.getPassword()),
                 request.getFullName().trim(),
-                request.getRole());
+                Role.STUDENT);
         userRepository.save(user);
 
         return toAuthResponse(user);

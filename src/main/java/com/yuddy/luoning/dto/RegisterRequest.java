@@ -1,9 +1,7 @@
 package com.yuddy.luoning.dto;
 
-import com.yuddy.luoning.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
@@ -19,10 +17,6 @@ public class RegisterRequest {
     @NotBlank
     @Size(max = 100)
     private String fullName;
-
-    // Chi cho phep STUDENT hoac INSTRUCTOR, kiem tra trong AuthService
-    @NotNull
-    private Role role;
 
     public RegisterRequest() {
     }
@@ -49,13 +43,5 @@ public class RegisterRequest {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 }
