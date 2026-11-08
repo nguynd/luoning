@@ -34,3 +34,7 @@ build/
 
 ### Secrets ###
 .env
+
+### Uploaded files ###
+uploads/
+frontend/public/*.mp4

@@ -4,8 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,6 +30,22 @@ public class GlobalExceptionHandler {
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Du lieu khong hop le");
         problem.setProperty("errors", errors);
+        return ResponseEntity.badRequest().body(problem);
+    }
+
+    // Thieu tham so tren URL, vi du goi /video ma khong co ?token=
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ProblemDetail> handleMissingParameter(MissingServletRequestParameterException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Thieu tham so: " + ex.getParameterName());
+        return ResponseEntity.badRequest().body(problem);
+    }
+
+    // Thieu file trong form-data, vi du upload video ma khong co truong "file"
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ProblemDetail> handleMissingPart(MissingServletRequestPartException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Thieu file: " + ex.getRequestPartName());
         return ResponseEntity.badRequest().body(problem);
     }
 }

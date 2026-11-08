@@ -2,6 +2,7 @@ package com.yuddy.luoning.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.yuddy.luoning.security.JwtService;
+import com.yuddy.luoning.security.VideoTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +13,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -42,6 +49,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/api/hello", "/error").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/instructor/**").hasAnyRole("INSTRUCTOR", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/courses/*/lessons/*").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/courses/*/enroll").hasRole("STUDENT")
@@ -79,9 +87,16 @@ public class SecurityConfig {
     // Bean nay se duoc dung lai de xac thuc ket noi WebSocket/signaling o phan live
     @Bean
     public JwtDecoder jwtDecoder(SecretKey jwtSecretKey) {
-        return NimbusJwtDecoder.withSecretKey(jwtSecretKey)
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(jwtSecretKey)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
+
+        // Token video cung chu ky nhung khong duoc dung thay token dang nhap
+        OAuth2TokenValidator<Jwt> notVideoToken = jwt -> jwt.getClaim(VideoTokenService.PURPOSE_CLAIM) == null
+                ? OAuth2TokenValidatorResult.success()
+                : OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Token nay khong dung de goi API", null));
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefault(), notVideoToken));
+        return decoder;
     }
 
     @Bean

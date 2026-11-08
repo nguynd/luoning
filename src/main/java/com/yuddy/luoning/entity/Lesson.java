@@ -26,6 +26,9 @@ public class Lesson {
 
     private String videoUrl;
 
+    // Ten file video da upload, nam trong thu muc app.storage.video-dir
+    private String videoFileName;
+
     private Integer durationSeconds;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -81,6 +84,14 @@ public class Lesson {
 
     public void setDurationSeconds(Integer durationSeconds) {
         this.durationSeconds = durationSeconds;
+    }
+
+    public String getVideoFileName() {
+        return videoFileName;
+    }
+
+    public void setVideoFileName(String videoFileName) {
+        this.videoFileName = videoFileName;
     }
 
 }

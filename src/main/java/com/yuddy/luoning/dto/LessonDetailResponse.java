@@ -7,9 +7,10 @@ public class LessonDetailResponse extends LessonResponse {
 
     private final String videoUrl;
 
-    public LessonDetailResponse(Lesson lesson) {
+    // videoUrl do service tinh: link phat video co token, hoac link ngoai cu
+    public LessonDetailResponse(Lesson lesson, String videoUrl) {
         super(lesson);
-        this.videoUrl = lesson.getVideoUrl();
+        this.videoUrl = videoUrl;
     }
 
     public String getVideoUrl() {

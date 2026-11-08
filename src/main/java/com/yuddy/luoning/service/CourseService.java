@@ -9,25 +9,48 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yuddy.luoning.dto.CourseRequest;
 import com.yuddy.luoning.dto.CourseResponse;
 import com.yuddy.luoning.entity.Course;
+import com.yuddy.luoning.entity.Lesson;
 import com.yuddy.luoning.entity.User;
 import com.yuddy.luoning.exception.ApiException;
 import com.yuddy.luoning.repository.CourseRepository;
+import com.yuddy.luoning.repository.EnrollmentRepository;
+import com.yuddy.luoning.repository.LessonRepository;
 
 @Service
 public class CourseService {
 
     private final CourseRepository courseRepository;
     private final UserService userService;
+    private final LessonRepository lessonRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final VideoStorageService videoStorageService;
 
-    public CourseService(CourseRepository courseRepository, UserService userService) {
+    public CourseService(CourseRepository courseRepository,
+            UserService userService,
+            LessonRepository lessonRepository,
+            EnrollmentRepository enrollmentRepository,
+            VideoStorageService videoStorageService) {
         this.courseRepository = courseRepository;
         this.userService = userService;
+        this.lessonRepository = lessonRepository;
+        this.enrollmentRepository = enrollmentRepository;
+        this.videoStorageService = videoStorageService;
     }
 
     @Transactional(readOnly = true)
     public List<CourseResponse> getAllCourses() {
         List<CourseResponse> result = new ArrayList<>();
         for (Course course : courseRepository.findAll()) {
+            result.add(new CourseResponse(course));
+        }
+        return result;
+    }
+
+    // Khoa hoc cua giang vien dang dang nhap, moi nhat len dau
+    @Transactional(readOnly = true)
+    public List<CourseResponse> getMyCourses(Long instructorId) {
+        List<CourseResponse> result = new ArrayList<>();
+        for (Course course : courseRepository.findByInstructorIdOrderByIdDesc(instructorId)) {
             result.add(new CourseResponse(course));
         }
         return result;
@@ -85,6 +108,19 @@ public class CourseService {
         Course course = findCourse(id); // không có → 404
         checkOwner(course, currentUserId); // không phải chủ → 403
 
+        // Hoc vien da dang ky (co the da tra tien) thi khong cho xoa
+        if (enrollmentRepository.existsByCourseId(id)) {
+            throw ApiException.conflict("Khoa hoc da co hoc vien dang ky, khong the xoa");
+        }
+
+        // Xoa bai giang va file video truoc, neu khong khoa ngoai se chan xoa khoa hoc
+        List<Lesson> lessons = lessonRepository.findByCourseIdOrderByOrderIndexAsc(id);
+        for (Lesson lesson : lessons) {
+            if (lesson.getVideoFileName() != null) {
+                videoStorageService.deleteAfterCommit(lesson.getVideoFileName());
+            }
+        }
+        lessonRepository.deleteAll(lessons);
         courseRepository.delete(course);
     }
 

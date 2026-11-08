@@ -20,7 +20,16 @@ spring:
       hibernate:
         format_sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
 app:
   jwt:
     secret: ${JWT_SECRET}
     expiration-minutes: 1440
+  storage:
+    video-dir: uploads/videos
+  # Dia chi backend nhin tu trinh duyet, dung de tao link phat video
+  public-base-url: http://localhost:8080
