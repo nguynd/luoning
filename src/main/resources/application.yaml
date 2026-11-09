@@ -31,5 +31,8 @@ app:
     expiration-minutes: 1440
   storage:
     video-dir: uploads/videos
+  admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
   # Dia chi backend nhin tu trinh duyet, dung de tao link phat video
   public-base-url: http://localhost:8080

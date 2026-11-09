@@ -1,18 +1,45 @@
 package com.yuddy.luoning.service;
 
+import com.yuddy.luoning.dto.RegisterRequest;
 import com.yuddy.luoning.dto.UserResponse;
+import com.yuddy.luoning.entity.Role;
 import com.yuddy.luoning.entity.User;
 import com.yuddy.luoning.exception.ApiException;
 import com.yuddy.luoning.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    // Dung chung cho hoc vien tu dang ky va admin tao tai khoan giang vien
+    @Transactional
+    public User createUser(RegisterRequest request, Role role) {
+        String email = request.getEmail().trim().toLowerCase();
+        if (userRepository.existsByEmail(email)) {
+            throw ApiException.conflict("Email da duoc su dung");
+        }
+
+        User user = new User(
+                email,
+                passwordEncoder.encode(request.getPassword()),
+                request.getFullName().trim(),
+                role);
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public UserResponse createInstructor(RegisterRequest request) {
+        return new UserResponse(createUser(request, Role.INSTRUCTOR));
     }
 
     public User getById(Long id) {

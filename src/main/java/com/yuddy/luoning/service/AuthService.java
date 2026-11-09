@@ -17,30 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, UserService userService,
+            PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        String email = request.getEmail().trim().toLowerCase();
-        if (userRepository.existsByEmail(email)) {
-            throw ApiException.conflict("Email da duoc su dung");
-        }
-
         // Tu dang ky luon la hoc vien, tai khoan giang vien do admin cap
-        User user = new User(
-                email,
-                passwordEncoder.encode(request.getPassword()),
-                request.getFullName().trim(),
-                Role.STUDENT);
-        userRepository.save(user);
-
+        User user = userService.createUser(request, Role.STUDENT);
         return toAuthResponse(user);
     }
 
