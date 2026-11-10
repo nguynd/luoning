@@ -53,6 +53,17 @@ public class UserService {
         return users.stream().map(UserResponse::new).toList();
     }
 
+    // Khoa hoac mo khoa tai khoan, khong cho khoa admin
+    @Transactional
+    public UserResponse setLocked(Long id, boolean locked) {
+        User user = getById(id);
+        if (user.getRole() == Role.ADMIN) {
+            throw ApiException.badRequest("Khong the khoa tai khoan admin");
+        }
+        user.setLocked(locked); // dirty checking tu UPDATE khi commit
+        return new UserResponse(user);
+    }
+
     public User getById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> ApiException.notFound("Khong tim thay nguoi dung"));

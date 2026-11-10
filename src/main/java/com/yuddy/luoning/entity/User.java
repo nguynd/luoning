@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 
@@ -36,6 +37,11 @@ public class User {
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
+    // Bang users da co du lieu, nen can gia tri mac dinh de them cot NOT NULL
+    @ColumnDefault("false")
+    @Column(nullable = false)
+    private boolean locked = false;
 
     public User() {
     }
@@ -74,6 +80,14 @@ public class User {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     public void setEmail(String email) {

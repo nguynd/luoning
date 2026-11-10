@@ -43,6 +43,11 @@ public class AuthService {
                 .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
                 .orElseThrow(() -> ApiException.unauthorized("Email hoac mat khau khong dung"));
 
+        // Kiem tra sau khi dung mat khau, de nguoi la khong do duoc tai khoan nao bi khoa
+        if (user.isLocked()) {
+            throw ApiException.forbidden("Tai khoan da bi khoa");
+        }
+
         return toAuthResponse(user);
     }
 

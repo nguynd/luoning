@@ -7,7 +7,9 @@ import com.yuddy.luoning.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,5 +39,15 @@ public class AdminController {
     @GetMapping("/users")
     public List<UserResponse> getUsers(@RequestParam(required = false) Role role) {
         return userService.getUsers(role);
+    }
+
+    @PutMapping("/users/{id}/lock")
+    public UserResponse lockUser(@PathVariable Long id) {
+        return userService.setLocked(id, true);
+    }
+
+    @PutMapping("/users/{id}/unlock")
+    public UserResponse unlockUser(@PathVariable Long id) {
+        return userService.setLocked(id, false);
     }
 }

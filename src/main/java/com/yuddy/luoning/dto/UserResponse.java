@@ -13,8 +13,10 @@ public class UserResponse {
     private final String fullName;
     private final Role role;
     private final Instant createdAt;
+    private final boolean locked;
 
     public UserResponse(User user) {
+        this.locked = user.isLocked();
         this.id = user.getId();
         this.email = user.getEmail();
         this.fullName = user.getFullName();
@@ -40,5 +42,9 @@ public class UserResponse {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isLocked() {
+        return locked;
     }
 }
