@@ -8,6 +8,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -46,6 +47,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleMissingPart(MissingServletRequestPartException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
                 "Thieu file: " + ex.getRequestPartName());
+        return ResponseEntity.badRequest().body(problem);
+    }
+
+    // Role khong hop le
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ProblemDetail> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Gia tri khong hop le cho tham so: " + ex.getName());
         return ResponseEntity.badRequest().body(problem);
     }
 }

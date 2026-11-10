@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -40,6 +42,15 @@ public class UserService {
     @Transactional
     public UserResponse createInstructor(RegisterRequest request) {
         return new UserResponse(createUser(request, Role.INSTRUCTOR));
+    }
+
+    // role == null nghia la lay tat ca
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUsers(Role role) {
+        List<User> users = (role == null)
+                ? userRepository.findAllByOrderByIdDesc()
+                : userRepository.findByRoleOrderByIdDesc(role);
+        return users.stream().map(UserResponse::new).toList();
     }
 
     public User getById(Long id) {
