@@ -1,17 +1,18 @@
 package com.yuddy.luoning.exception;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 // Tra loi theo chuan RFC 9457 (ProblemDetail): { status, title, detail, ... }
 @RestControllerAdvice
@@ -55,6 +56,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
                 "Gia tri khong hop le cho tham so: " + ex.getName());
+        return ResponseEntity.badRequest().body(problem);
+    }
+
+    // JSON khong hop le
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ProblemDetail> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Du lieu gui len khong dung dinh dang");
         return ResponseEntity.badRequest().body(problem);
     }
 }
