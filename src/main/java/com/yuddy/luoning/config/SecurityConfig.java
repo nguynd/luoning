@@ -1,7 +1,9 @@
 package com.yuddy.luoning.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.yuddy.luoning.repository.UserRepository;
 import com.yuddy.luoning.security.JwtService;
+import com.yuddy.luoning.security.LockedUserCheckingConverter;
 import com.yuddy.luoning.security.VideoTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +43,7 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserRepository userRepository) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
@@ -59,7 +61,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasAnyRole("INSTRUCTOR", "ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(
+                                new LockedUserCheckingConverter(jwtAuthenticationConverter(), userRepository))));
         return http.build();
     }
 
