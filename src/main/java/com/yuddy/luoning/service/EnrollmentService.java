@@ -2,6 +2,7 @@ package com.yuddy.luoning.service;
 
 import com.yuddy.luoning.dto.EnrollmentResponse;
 import com.yuddy.luoning.entity.Course;
+import com.yuddy.luoning.entity.CourseStatus;
 import com.yuddy.luoning.entity.Enrollment;
 import com.yuddy.luoning.entity.User;
 import com.yuddy.luoning.exception.ApiException;
@@ -30,6 +31,11 @@ public class EnrollmentService {
     @Transactional
     public EnrollmentResponse enroll(Long courseId, Long userId) {
         Course course = courseService.findCourse(courseId); // không có → 404
+
+        // Chi dang ky moi duoc khoa dang ban
+        if (course.getStatus() != CourseStatus.PUBLISHED) {
+            throw ApiException.notFound("Khong tim thay khoa hoc");
+        }
 
         if (enrollmentRepository.existsByUserIdAndCourseId(userId, courseId)) {
             throw ApiException.conflict("Ban da dang ky khoa hoc nay");

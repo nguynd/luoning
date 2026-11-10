@@ -45,8 +45,8 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public CourseResponse getCourseById(@PathVariable Long id) {
-        return courseService.getCourseById(id);
+    public CourseResponse getCourseById(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        return courseService.getCourseById(id, CurrentUser.idOrNull(jwt));
     }
 
     @PutMapping("/{id}")

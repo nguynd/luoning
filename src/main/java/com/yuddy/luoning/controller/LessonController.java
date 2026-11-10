@@ -39,8 +39,8 @@ public class LessonController {
     }
 
     @GetMapping
-    public List<LessonResponse> getLessons(@PathVariable Long courseId) {
-        return lessonService.getLessons(courseId);
+    public List<LessonResponse> getLessons(@PathVariable Long courseId, @AuthenticationPrincipal Jwt jwt) {
+        return lessonService.getLessons(courseId, CurrentUser.idOrNull(jwt));
     }
 
     @PostMapping

@@ -40,8 +40,9 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public List<CourseResponse> getAllCourses() {
+        // Trang chu chi hien khoa dang ban
         List<CourseResponse> result = new ArrayList<>();
-        for (Course course : courseRepository.findAll()) {
+        for (Course course : courseRepository.findByStatusOrderByIdDesc(CourseStatus.PUBLISHED)) {
             result.add(new CourseResponse(course));
         }
         return result;
@@ -71,8 +72,22 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public CourseResponse getCourseById(Long id) {
-        return new CourseResponse(findCourse(id));
+    public CourseResponse getCourseById(Long id, Long viewerId) {
+        return new CourseResponse(findVisibleCourse(id, viewerId));
+    }
+
+    // PUBLISHED: ai cung xem duoc. DRAFT/ARCHIVED: chi giang vien cua khoa va hoc vien da dang ky.
+    // Nguoi khac nhan 404 nhu the khoa hoc khong ton tai.
+    public Course findVisibleCourse(Long id, Long viewerId) {
+        Course course = findCourse(id);
+        if (course.getStatus() == CourseStatus.PUBLISHED) {
+            return course;
+        }
+        if (viewerId != null && (course.getInstructor().getId().equals(viewerId)
+                || enrollmentRepository.existsByUserIdAndCourseId(viewerId, id))) {
+            return course;
+        }
+        throw ApiException.notFound("Khong tim thay khoa hoc");
     }
 
     public Course findCourse(Long id) {

@@ -46,8 +46,8 @@ public class LessonService {
     }
 
     @Transactional(readOnly = true)
-    public List<LessonResponse> getLessons(Long courseId) {
-        courseService.findCourse(courseId); // khóa học không tồn tại → 404
+    public List<LessonResponse> getLessons(Long courseId, Long viewerId) {
+        courseService.findVisibleCourse(courseId, viewerId); // không có hoặc không được xem → 404
 
         List<LessonResponse> result = new ArrayList<>();
         for (Lesson lesson : lessonRepository.findByCourseIdOrderByOrderIndexAsc(courseId)) {

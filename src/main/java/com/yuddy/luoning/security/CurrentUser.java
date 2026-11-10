@@ -10,4 +10,9 @@ public final class CurrentUser {
     public static Long id(Jwt jwt) {
         return Long.valueOf(jwt.getSubject());
     }
+
+    // API cong khai: khach chua dang nhap thi jwt == null
+    public static Long idOrNull(Jwt jwt) {
+        return jwt == null ? null : id(jwt);
+    }
 }
