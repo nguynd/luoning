@@ -1,6 +1,7 @@
 package com.yuddy.luoning.dto;
 
 import com.yuddy.luoning.entity.Course;
+import com.yuddy.luoning.entity.CourseStatus;
 
 public class CourseResponse {
 
@@ -10,6 +11,7 @@ public class CourseResponse {
     private final double price;
     private final Long instructorId;
     private final String instructorName;
+    private final CourseStatus status;
 
     public CourseResponse(Course course) {
         this.id = course.getId();
@@ -18,6 +20,7 @@ public class CourseResponse {
         this.price = course.getPrice();
         this.instructorId = course.getInstructor().getId();
         this.instructorName = course.getInstructor().getFullName();
+        this.status = course.getStatus();
     }
 
     public Long getId() {
@@ -42,6 +45,10 @@ public class CourseResponse {
 
     public String getInstructorName() {
         return instructorName;
+    }
+
+    public CourseStatus getStatus() {
+        return status;
     }
 
 }

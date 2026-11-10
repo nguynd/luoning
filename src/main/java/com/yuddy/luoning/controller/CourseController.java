@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.yuddy.luoning.dto.CourseRequest;
 import com.yuddy.luoning.dto.CourseResponse;
+import com.yuddy.luoning.dto.CourseStatusRequest;
 import com.yuddy.luoning.security.CurrentUser;
 import com.yuddy.luoning.service.CourseService;
 
@@ -53,6 +54,14 @@ public class CourseController {
             @Valid @RequestBody CourseRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return courseService.updateCourse(id, request, CurrentUser.id(jwt));
+    }
+
+    // Body: { "status": "PUBLISHED" } (DRAFT | PUBLISHED | ARCHIVED)
+    @PutMapping("/{id}/status")
+    public CourseResponse changeStatus(@PathVariable Long id,
+            @Valid @RequestBody CourseStatusRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        return courseService.changeStatus(id, request.getStatus(), CurrentUser.id(jwt));
     }
 
     @DeleteMapping("/{id}")

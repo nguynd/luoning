@@ -2,6 +2,8 @@ package com.yuddy.luoning.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "courses")
@@ -28,6 +31,12 @@ public class Course {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "instructor_id")
     private User instructor;
+
+    // Khoa cu trong DB nhan PUBLISHED (giu nguyen hanh vi), khoa moi tao la DRAFT
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'PUBLISHED'")
+    @Column(nullable = false, length = 20)
+    private CourseStatus status = CourseStatus.DRAFT;
 
     public Course() {
     }
@@ -57,6 +66,14 @@ public class Course {
 
     public User getInstructor() {
         return instructor;
+    }
+
+    public CourseStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CourseStatus status) {
+        this.status = status;
     }
 
     public void setId(Long id) {

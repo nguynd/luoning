@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yuddy.luoning.dto.CourseRequest;
 import com.yuddy.luoning.dto.CourseResponse;
 import com.yuddy.luoning.entity.Course;
+import com.yuddy.luoning.entity.CourseStatus;
 import com.yuddy.luoning.entity.Lesson;
 import com.yuddy.luoning.entity.User;
 import com.yuddy.luoning.exception.ApiException;
@@ -94,6 +95,19 @@ public class CourseService {
         course.setDescription(request.getDescription());
         course.setPrice(request.getPrice());
 
+        return new CourseResponse(course);
+    }
+
+    @Transactional
+    public CourseResponse changeStatus(Long id, CourseStatus newStatus, Long currentUserId) {
+        Course course = findOwnedCourse(id, currentUserId);
+
+        // Da co hoc vien thi khong duoc quay ve nhap, chi duoc go (ARCHIVED)
+        if (newStatus == CourseStatus.DRAFT && enrollmentRepository.existsByCourseId(id)) {
+            throw ApiException.conflict("Khoa hoc da co hoc vien, chi co the go (ARCHIVED)");
+        }
+
+        course.setStatus(newStatus);
         return new CourseResponse(course);
     }
 
