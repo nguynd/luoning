@@ -21,6 +21,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ProblemDetail> handleApiException(ApiException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
+        if (ex.getErrors() != null) {
+            problem.setProperty("errors", ex.getErrors());
+        }
         return ResponseEntity.status(ex.getStatus()).body(problem);
     }
 

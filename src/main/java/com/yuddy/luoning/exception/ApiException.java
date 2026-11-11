@@ -2,17 +2,30 @@ package com.yuddy.luoning.exception;
 
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 public class ApiException extends RuntimeException {
 
     private final HttpStatus status;
+    // Danh sach loi chi tiet (vi du loi tung dong khi import), co the null
+    private final List<String> errors;
 
     public ApiException(HttpStatus status, String message) {
+        this(status, message, null);
+    }
+
+    public ApiException(HttpStatus status, String message, List<String> errors) {
         super(message);
         this.status = status;
+        this.errors = errors;
     }
 
     public HttpStatus getStatus() {
         return status;
+    }
+
+    public List<String> getErrors() {
+        return errors;
     }
 
     public static ApiException notFound(String message) {
@@ -21,6 +34,10 @@ public class ApiException extends RuntimeException {
 
     public static ApiException badRequest(String message) {
         return new ApiException(HttpStatus.BAD_REQUEST, message);
+    }
+
+    public static ApiException badRequest(String message, List<String> errors) {
+        return new ApiException(HttpStatus.BAD_REQUEST, message, errors);
     }
 
     public static ApiException conflict(String message) {
