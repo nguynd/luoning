@@ -1,5 +1,6 @@
 package com.yuddy.luoning.repository;
 
+import com.yuddy.luoning.entity.ExamType;
 import com.yuddy.luoning.entity.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +16,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     // Kem courseId de khong xoa nham cau hoi cua khoa khac qua URL
     Optional<Question> findByIdAndCourseId(Long id, Long courseId);
+
+    // ... AND exam_type IN (?, ?): dem cau theo muc do cho mot loai de
+    long countByCourseIdAndDifficultyAndExamTypeIn(Long courseId, int difficulty, List<ExamType> examTypes);
 }

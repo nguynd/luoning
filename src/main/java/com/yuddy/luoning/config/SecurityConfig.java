@@ -55,6 +55,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/instructor/**").hasAnyRole("INSTRUCTOR", "ADMIN")
                         // Ngan hang cau hoi co dap an: phai dat TRUOC rule GET /api/courses/** permitAll
                         .requestMatchers("/api/courses/*/questions/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers("/api/courses/*/exams/*/config").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        // Cac API thi con lai (hoc vien lam bai) phai dang nhap
+                        .requestMatchers("/api/courses/*/exams/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/courses/*/lessons/*").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/courses/*/enroll").hasRole("STUDENT")
