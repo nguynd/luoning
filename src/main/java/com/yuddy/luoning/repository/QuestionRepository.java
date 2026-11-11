@@ -12,4 +12,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     Optional<Question> findByCourseIdAndCode(Long courseId, String code);
 
     List<Question> findByCourseIdOrderByCodeAsc(Long courseId);
+
+    // Kem courseId de khong xoa nham cau hoi cua khoa khac qua URL
+    Optional<Question> findByIdAndCourseId(Long id, Long courseId);
 }
