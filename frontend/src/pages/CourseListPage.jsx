@@ -10,7 +10,7 @@ function CourseListPage() {
 
   useEffect(() => {
     client.get('/courses')
-      .then((response) => setCourses(response.data))
+      .then((response) => setCourses(response.data.content))
       .catch(() => setError('Không tải được danh sách khóa học. Bạn kiểm tra backend đã chạy chưa.'))
       .finally(() => setLoading(false))
   }, [])

@@ -1,7 +1,5 @@
 package com.yuddy.luoning.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -12,12 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yuddy.luoning.dto.CourseRequest;
 import com.yuddy.luoning.dto.CourseResponse;
 import com.yuddy.luoning.dto.CourseStatusRequest;
+import com.yuddy.luoning.dto.PageResponse;
 import com.yuddy.luoning.security.CurrentUser;
 import com.yuddy.luoning.service.CourseService;
 
@@ -33,9 +33,13 @@ public class CourseController {
         this.courseService = courseService;
     }
 
+    // GET /api/courses?q=java&page=0&size=12 (ca 3 tham so deu khong bat buoc)
     @GetMapping
-    public List<CourseResponse> getAllCourses() {
-        return courseService.getAllCourses();
+    public PageResponse<CourseResponse> searchCourses(
+            @RequestParam(defaultValue = "") String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+        return courseService.searchCourses(q, page, size);
     }
 
     @PostMapping

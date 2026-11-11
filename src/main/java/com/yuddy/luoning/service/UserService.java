@@ -1,16 +1,20 @@
 package com.yuddy.luoning.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.yuddy.luoning.dto.PageResponse;
 import com.yuddy.luoning.dto.RegisterRequest;
 import com.yuddy.luoning.dto.UserResponse;
 import com.yuddy.luoning.entity.Role;
 import com.yuddy.luoning.entity.User;
 import com.yuddy.luoning.exception.ApiException;
 import com.yuddy.luoning.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class UserService {
@@ -46,11 +50,14 @@ public class UserService {
 
     // role == null nghia la lay tat ca
     @Transactional(readOnly = true)
-    public List<UserResponse> getUsers(Role role) {
-        List<User> users = (role == null)
-                ? userRepository.findAllByOrderByIdDesc()
-                : userRepository.findByRoleOrderByIdDesc(role);
-        return users.stream().map(UserResponse::new).toList();
+    public PageResponse<UserResponse> getUsers(Role role, int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, 50);
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "id"));
+        Page<User> users = (role == null)
+                ? userRepository.findAllBy(pageable)
+                : userRepository.findByRole(role, pageable);
+        return new PageResponse<>(users.map(UserResponse::new));
     }
 
     // Khoa hoac mo khoa tai khoan, khong cho khoa admin

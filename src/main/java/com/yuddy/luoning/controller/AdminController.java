@@ -1,5 +1,6 @@
 package com.yuddy.luoning.controller;
 
+import com.yuddy.luoning.dto.PageResponse;
 import com.yuddy.luoning.dto.RegisterRequest;
 import com.yuddy.luoning.dto.UserResponse;
 import com.yuddy.luoning.entity.Role;
@@ -37,8 +38,11 @@ public class AdminController {
 
     // GET /api/admin/users hoac /api/admin/users?role=INSTRUCTOR
     @GetMapping("/users")
-    public List<UserResponse> getUsers(@RequestParam(required = false) Role role) {
-        return userService.getUsers(role);
+    public PageResponse<UserResponse> getUsers(@RequestParam(required = false) Role role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        return userService.getUsers(role, page, size);
     }
 
     @PutMapping("/users/{id}/lock")

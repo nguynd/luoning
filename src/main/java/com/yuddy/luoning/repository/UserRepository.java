@@ -1,11 +1,13 @@
 package com.yuddy.luoning.repository;
 
-import com.yuddy.luoning.entity.Role;
-import com.yuddy.luoning.entity.User;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
+import com.yuddy.luoning.entity.Role;
+import com.yuddy.luoning.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -15,7 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByIdAndLockedTrue(Long id);
 
-    List<User> findAllByOrderByIdDesc();
+    Page<User> findAllBy(Pageable pageable);
 
-    List<User> findByRoleOrderByIdDesc(Role role);
+    Page<User> findByRole(Role role, Pageable pageable);
+
 }

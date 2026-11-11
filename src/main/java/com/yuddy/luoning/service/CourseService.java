@@ -3,11 +3,15 @@ package com.yuddy.luoning.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yuddy.luoning.dto.CourseRequest;
 import com.yuddy.luoning.dto.CourseResponse;
+import com.yuddy.luoning.dto.PageResponse;
 import com.yuddy.luoning.entity.Course;
 import com.yuddy.luoning.entity.CourseStatus;
 import com.yuddy.luoning.entity.Lesson;
@@ -39,13 +43,16 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public List<CourseResponse> getAllCourses() {
+    public PageResponse<CourseResponse> searchCourses(String keyword, int page, int size) {
+        // Chan gia tri xau: page am lam PageRequest nem loi, size qua lon lam nang server
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, 50);
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "id"));
+
         // Trang chu chi hien khoa dang ban
-        List<CourseResponse> result = new ArrayList<>();
-        for (Course course : courseRepository.findByStatusOrderByIdDesc(CourseStatus.PUBLISHED)) {
-            result.add(new CourseResponse(course));
-        }
-        return result;
+        return new PageResponse<>(courseRepository
+                .findByStatusAndTitleContainingIgnoreCase(CourseStatus.PUBLISHED, keyword.trim(), pageable)
+                .map(CourseResponse::new));
     }
 
     // Khoa hoc cua giang vien dang dang nhap, moi nhat len dau
