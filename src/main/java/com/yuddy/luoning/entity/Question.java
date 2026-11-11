@@ -74,13 +74,15 @@ public class Question {
         this.code = code;
     }
 
-    // Tra ve cac dap an khong rong theo thu tu A, B, C...
+    // Tra ve cac dap an theo thu tu A, B, C... va dung o o trong dau tien.
+    // Import da chan o trong nam giua, nen vi tri trong list luon khop voi chu cai (0 = A, 1 = B...)
     public List<String> getOptions() {
         List<String> options = new ArrayList<>();
         for (String option : List.of(nz(optionA), nz(optionB), nz(optionC), nz(optionD), nz(optionE), nz(optionF))) {
-            if (!option.isEmpty()) {
-                options.add(option);
+            if (option.isEmpty()) {
+                break;
             }
+            options.add(option);
         }
         return options;
     }
